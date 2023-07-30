@@ -99,6 +99,26 @@ class ProductController {
 				.build();
 	}
 	
+	@ResponseStatus(HttpStatus.OK)
+	@DeleteMapping("/{language}/delete/{productId}")
+	public InternalApiResponse<ProductResponse> deleteProduct(@PathVariable("language") Language language,
+			@PathVariable("productId") Long productId) {
+		log.debug("[{}][deleteProduct] -> request productId: {}", this.getClass().getSimpleName(), productId);
+		Product product = productRepositoryService.deleteProduct(language, productId);
+		ProductResponse productResponse = convertProductResponse(product);
+		log.debug("[{}][deleteProduct] -> request productId: {}", this.getClass().getSimpleName(), productResponse);
+		return InternalApiResponse.<ProductResponse>builder()
+				.friendlyMessage(FriendlyMessage.builder()
+						.title(FriendlyMessageUtils.getFriendlyMessage(language, FriendlyMessageCodes.SUCCESS))
+						.description(FriendlyMessageUtils.getFriendlyMessage(language,
+								FriendlyMessageCodes.PRODUCT_SUCCESSFULLY_DELETED))
+						.build())
+				.httpStatus(HttpStatus.OK)
+				.hasError(false)
+				.payload(productResponse)
+				.build();
+	}
+	
 	//urun listesindeki urunleri, urun response'una donusturmek icin metot yazalim
 	public List<ProductResponse> convertProductResponseList(List<Product> productList){
 		//productList icindeki her urunu ProductResponse tipindeki liste icine alalim
