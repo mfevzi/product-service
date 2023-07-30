@@ -57,7 +57,15 @@ public class ProductRepositoryServiceImpl implements IProductRepositoryService {
 
 	@Override
 	public List<Product> getProducts(Language language) {
-		return null;
+		log.debug("[{}][getProducts]", this.getClass().getSimpleName());
+		List<Product> products = productRepository.getAllByDeletedFalse();
+		//liste bos ise hata dondurelim
+		if(products.isEmpty()) {
+			throw new ProductNotFoundException(language, FriendlyMessageCodes.PRODUCT_NOT_FOUND,
+					"Products not found");
+		}
+		log.debug("[{}][getProducts] -> response: {}", this.getClass().getSimpleName(), products);
+		return products;
 	}
 
 	@Override

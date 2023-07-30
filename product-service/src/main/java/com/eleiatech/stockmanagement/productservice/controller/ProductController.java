@@ -13,6 +13,8 @@ import com.eleiatech.stockmanagement.productservice.service.IProductRepositorySe
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.aspectj.weaver.reflect.ArgNameFinder;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,6 +82,36 @@ class ProductController {
 				.hasError(false)
 				.payload(productResponse)
 				.build();
+	}
+	
+	@ApiOperation(value = "This endpoint get all product.") //swagger api belgeleme araci. Api aciklamalari icin kullanilir
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = "/{language}/products")
+	public InternalApiResponse<List<ProductResponse>> getProducts(@PathVariable("language") Language language) {
+		log.debug("[{}][getProducts]", this.getClass().getSimpleName());
+		List<Product> products = productRepositoryService.getProducts(language);
+		List<ProductResponse> productResponses = convertProductResponseList(products);
+		log.debug("[{}][getProducts]", this.getClass().getSimpleName(), productResponses);
+		return InternalApiResponse.<List<ProductResponse>>builder().
+				httpStatus(HttpStatus.OK)
+				.hasError(false)
+				.payload(productResponses)
+				.build();
+	}
+	
+	//urun listesindeki urunleri, urun response'una donusturmek icin metot yazalim
+	public List<ProductResponse> convertProductResponseList(List<Product> productList){
+		//productList icindeki her urunu ProductResponse tipindeki liste icine alalim
+		return productList.stream()
+				.map(arg -> ProductResponse.builder()
+						.productId(arg.getProductId())
+						.productName(arg.getProductName())
+						.quantity(arg.getQuantity())
+						.price(arg.getPrice())
+						.productCreatedDate(arg.getProductCreatedDate().getTime())
+						.productUpdatedDate(arg.getProductUpdatedDate().getTime())
+						.build())
+				.collect(Collectors.toList());
 	}
 	
 	private ProductResponse convertProductResponse(Product product) {
