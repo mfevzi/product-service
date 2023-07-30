@@ -11,6 +11,13 @@ info:
 
 server:
   port: 9788
+#loglari ekranda gorebilmek icin log seviyesini root'a cekelim
+logging:
+  level:
+    #root: DEBUG
+    #yukaridaki sekilde cok fazla log ekrana geldiginden asagidaki ayari yaptik
+    root: off
+    com.eleiatech: DEBUG
 
 ---
 spring:
