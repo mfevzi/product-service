@@ -60,7 +60,28 @@ class ProductController {
 				.payload(productResponse)
 				.build();
 	}
-
+	
+	@ResponseStatus(HttpStatus.OK)
+	@PutMapping(value = "/{language}/update/{productId}")
+	public InternalApiResponse<ProductResponse> updateProduct(@PathVariable("language") Language language,
+			@PathVariable("productId") Long productId,
+			@RequestBody ProductUpdateRequest productUpdateRequest){
+		log.debug("[{}][updateProduct] -> request: {} {}", this.getClass().getSimpleName(), productId, productUpdateRequest);
+		Product product = productRepositoryService.updateProduct(language, productId, productUpdateRequest);
+		ProductResponse productResponse = convertProductResponse(product);
+		log.debug("[{}][updateProduct] -> response: {}", this.getClass().getSimpleName(), productResponse);
+		return InternalApiResponse.<ProductResponse>builder()
+				.friendlyMessage(FriendlyMessage.builder()
+						.title(FriendlyMessageUtils.getFriendlyMessage(language, FriendlyMessageCodes.SUCCESS))
+						.description(FriendlyMessageUtils.getFriendlyMessage(language,
+								FriendlyMessageCodes.PRODUCT_SUCCESSFULLY_UPDATED))
+						.build())
+				.httpStatus(HttpStatus.OK)
+				.hasError(false)
+				.payload(productResponse)
+				.build();
+	}
+	
 	private ProductResponse convertProductResponse(Product product) {
 		return ProductResponse.builder().productId(product.getProductId()).productName(product.getProductName())
 				.quantity(product.getQuantity()).price(product.getPrice())

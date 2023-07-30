@@ -15,6 +15,7 @@ import net.bytebuddy.asm.Advice.This;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -61,7 +62,19 @@ public class ProductRepositoryServiceImpl implements IProductRepositoryService {
 
 	@Override
 	public Product updateProduct(Language language, Long productId, ProductUpdateRequest productUpdateRequest) {
-		return null;
+		log.debug("[{}][updateProduct] -> request productId: {}", this.getClass().getSimpleName(), productUpdateRequest);
+		//guncellenecek urunu bul
+		Product product = getProduct(language, productId);
+		//urunun yeni degerlerini set et
+		product.setProductName(productUpdateRequest.getProductName());
+		product.setQuantity(productUpdateRequest.getQuantity());
+		product.setPrice(productUpdateRequest.getPrice());
+		product.setProductCreatedDate(product.getProductCreatedDate());
+		product.setProductUpdatedDate(new Date());
+		//yeni degerler set edilen urunu kaydedelim
+		Product productResponse = productRepository.save(product);
+		log.debug("[{}][updateProduct] -> response: {}", this.getClass().getSimpleName(), productResponse);
+		return productResponse;
 	}
 
 	@Override
